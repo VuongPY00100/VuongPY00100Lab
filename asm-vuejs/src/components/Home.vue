@@ -29,24 +29,13 @@
                             </h5>
 
                             <div class="col-sm-5">
-                                <img src="#" alt="Phương pháp tập Pilates">
+                                <img src="/src/assets/AnhTin/AT1.png" alt="Phương pháp tập Pilates" style="width: 150px;">
                             </div>
 
                             <p class="card-text text-secondary">
                                 Ngoài việc giúp duy trì vóc dáng, cải thiện sự linh hoạt, đều đặn cho người tập, 
                                 Pilates giúp cơ bắp và các khớp hoạt động hiệu quả, khoẻ mạnh hơn.
                             </p>
-                        </div>
-
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                Jojo theme
-                            </h5>
-
-                            <iframe width="300" height="175" src="https://www.youtube.com/embed/U0TXIXTzJEY?si=atx0gqYw1NkHM7dT" 
-                            title="YouTube video player" frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
                         </div>
                     </div>
                 </div>
