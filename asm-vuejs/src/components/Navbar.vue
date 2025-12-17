@@ -1,20 +1,30 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 
-const isLogin = ref(false)
+const displayName = ref('User')
 
-const checkLogin = () => {
-    isLogin.value = localStorage.getItem('isLogin') === 'true'
+const loadUserName = () => {
+    const isLogin = localStorage.getItem('isLogin') === 'true' // sửa ở đây
+
+    if (isLogin) { // sửa ở đây
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'))
+        displayName.value = currentUser?.fullname || 'User'
+    } else {
+        displayName.value = 'User'
+    }
 }
 
-const logout = () => {
-    localStorage.removeItem('isLogin')
-    alert('Đã đăng xuất!')
-    isLogin.value = false
+const onUserChanged = () => {
+    loadUserName()
 }
 
 onMounted(() => {
-    checkLogin()
+    loadUserName()
+    window.addEventListener('f5', onUserChanged)
+})
+
+onUnmounted(() => {
+    window.removeEventListener('f5', onUserChanged)
 })
 </script>
 <!-- -->
@@ -22,27 +32,19 @@ onMounted(() => {
     <header class="navbar ">
         <div class="nav-left">
             <div class="logo">
-            <router-link to="/"><span>Blog</span></router-link>
+            <span>Blog</span>
             </div>
 
             <ul class="nav-menu">
-                <li><i class="bi bi-list-task"></i><router-link to="/baiviet">Bài viết</router-link></li>
-                <li><i class="bi bi-film"></i><router-link to="/video">Video</router-link></li>
-                <li><i class="bi bi-info-circle"></i><a href="#"> Giới thiệu</a></li>
-                <li><i class="bi bi-calendar3"></i><a href="#" > Sự kiện</a></li>
+                <li><i class="bi bi-house"></i><router-link to="/"> Trang chủ</router-link></li>
+                <li><i class="bi bi-list-task"></i><router-link to="/baiviet"> Bài viết</router-link></li>
+                <li><i class="bi bi-film"></i><router-link to="/video"> Video</router-link></li>
+                <li><i class="bi bi-person-circle"></i><router-link to="/info"> Info</router-link></li>
             </ul>
         </div>
 
         <div class="nav-righ">
-            <!-- CHƯA LOGIN -->
-            <router-link v-if="!isLogin" to="/login">
-                Login
-            </router-link>
-
-            <!-- ĐÃ LOGIN -->
-            <a v-else href="#" @click.prevent="logout">
-                Logout
-            </a>
+            <span>Xin chào, {{ displayName }}</span>
         </div>
     </header>
 </template>

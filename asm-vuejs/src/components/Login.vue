@@ -3,40 +3,9 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-
 const activeTab = ref('login')
 
-//login
-const loginEmail = ref('')
-const loginPassword = ref('')
-
-const handleLogin = () => {
-    const user = JSON.parse(localStorage.getItem('user'))
-
-    if (!user) {
-        alert('Chưa có tài khoản!')
-        return
-    }
-
-    if (
-        loginEmail.value === user.email &&
-        loginPassword.value === user.password
-    ) {
-        localStorage.setItem('isLogin', 'true')
-        alert('Đăng nhập thành công!')
-
-        //reset form login
-        loginEmail.value = ''
-        loginPassword.value = ''
-
-        //về trang chủ
-        router.push('/')
-    } else {
-        alert('Sai email hoặc mật khẩu!')
-    }
-}
-
-//register
+//REGISTER
 const registerData = ref({
     fullname: '',
     email: '',
@@ -44,11 +13,17 @@ const registerData = ref({
     password: '',
     confirmPassword: '',
     gender: '',
-    language: 'vi',
     terms: false
 })
 
 const handleRegister = () => {
+    const users = JSON.parse(localStorage.getItem('users')) || []
+    // check trùng email
+    if (users.some(u => u.email === registerData.value.email)) {
+        alert('Email đã tồn tại!')
+        return
+    }
+
     if (registerData.value.password !== registerData.value.confirmPassword) {
         alert('Mật khẩu xác nhận không khớp!')
         return
@@ -59,10 +34,18 @@ const handleRegister = () => {
         return
     }
 
-    localStorage.setItem('user', JSON.stringify(registerData.value))
+    users.push({
+        fullname: registerData.value.fullname,
+        email: registerData.value.email,
+        phone: registerData.value.phone,
+        password: registerData.value.password,
+        gender: registerData.value.gender
+    })
+
+    localStorage.setItem('users', JSON.stringify(users))
     alert('Đăng ký thành công!')
 
-    // reset form đăng ký
+    //reset form
     registerData.value = {
         fullname: '',
         email: '',
@@ -70,31 +53,59 @@ const handleRegister = () => {
         password: '',
         confirmPassword: '',
         gender: '',
-        language: 'vi',
         terms: false
     }
 
-    // chuyển sang tab login
     activeTab.value = 'login'
+}
+
+//LOGIN
+const loginEmail = ref('')
+const loginPassword = ref('')
+
+const handleLogin = () => {
+    const users = JSON.parse(localStorage.getItem('users')) || []
+
+    const user = users.find(
+        u =>
+            u.email === loginEmail.value &&
+            u.password === loginPassword.value
+    )
+
+    if (!user) {
+        alert('Email hoặc mật khẩu không đúng!')
+        return
+    }
+
+    localStorage.setItem('isLogin', 'true')
+    localStorage.setItem('currentUser', JSON.stringify(user))
+
+    //phát event cho Nav
+    window.dispatchEvent(new Event('f5'))
+
+    alert('Đăng nhập thành công!')
+
+    loginEmail.value = ''
+    loginPassword.value = ''
+
+    router.push('/')
 }
 
 const onlyNumber = () => {
     registerData.value.phone =
-    registerData.value.phone.replace(/\D/g, '')
+        registerData.value.phone.replace(/\D/g, '')
 }
+
 </script>
 <template>
     <div class="container mt-4" style="width: 450px;">
-        <h3 class="text-center mb-3">Đăng nhập / Đăng ký</h3>
-
         <!-- tab -->
         <ul class="nav nav-tabs">
             <li class="nav-item">
                 <button
                     class="nav-link"
                     :class="{ active: activeTab === 'login' }"
-                    @click="activeTab = 'login'"
-                >
+                    @click="activeTab = 'login'" >
                     Đăng nhập
                 </button>
             </li>
@@ -102,8 +113,7 @@ const onlyNumber = () => {
                 <button
                     class="nav-link"
                     :class="{ active: activeTab === 'register' }"
-                    @click="activeTab = 'register'"
-                >
+                    @click="activeTab = 'register'">
                     Đăng ký
                 </button>
             </li>
@@ -112,7 +122,7 @@ const onlyNumber = () => {
         <div class="tab-content mt-3">
             <!-- login -->
             <div v-if="activeTab === 'login'" class="card p-4">
-                <h4>Form Đăng nhập</h4>
+                <h4 class="center">Đăng nhập</h4>
                 <form @submit.prevent="handleLogin">
                     <div class="mb-3">
                         <label>Email</label>
@@ -130,7 +140,7 @@ const onlyNumber = () => {
 
             <!-- register -->
             <div v-if="activeTab === 'register'" class="card p-4">
-                <h4>Form Đăng ký</h4>
+                <h4 class="center">Đăng ký</h4>
                 <form @submit.prevent="handleRegister">
 
                     <div class="mb-3">
@@ -186,14 +196,6 @@ const onlyNumber = () => {
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label>Ngôn ngữ</label>
-                        <select class="form-select" v-model="registerData.language">
-                            <option value="vi">Tiếng Việt</option>
-                            <option value="en">English</option>
-                        </select>
-                    </div>
-
                     <div class="form-check mb-3">
                         <input
                             class="form-check-input"
@@ -212,5 +214,7 @@ const onlyNumber = () => {
     </div>
 </template>
 <style scoped>
-
+.center {
+    text-align: center;
+}
 </style>
